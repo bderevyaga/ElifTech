@@ -66,7 +66,7 @@ function allPointSum(id) {
 		if (data[index].parent === id) {
 			var buf = allPointSum(data[index].id);
 			ul.appendChild(createElementTree(data[index], buf.allPoint)).appendChild(buf.ul);
-			allPoint += data[index].point; 
+			allPoint += data[index].point;
 			allPoint += buf.allPoint;
 		}
 	}
@@ -79,35 +79,35 @@ function allPointSum(id) {
 
 function createElementTree(element, allPoint) {
 	var span = [];
-	var neme = element.name + ' | ' + element.point + '$' + (allPoint > 0? ' | ' + (element.point + allPoint) + '$': '');
+	var neme = element.name + ' | ' + element.point + '$' + (allPoint > 0 ? ' | ' + (element.point + allPoint) + '$' : '');
 	span.push(createSpan([], hiddeElementTree, neme));
-	span.push(createSpan(['label', 'label-primary'], function(){edit(element.id)}, 'edit'));
-	span.push(createSpan(['label', 'label-danger'], function(){del(element.id)}, 'del'));
+	span.push(createSpan(['label', 'label-primary'], function () { edit(element.id) }, 'edit'));
+	span.push(createSpan(['label', 'label-danger'], function () { del(element.id) }, 'del'));
 	var li = document.createElement('li');
-	for(var index in span)
-		li.appendChild(span[index]); 
+	for (var index in span)
+		li.appendChild(span[index]);
 	return li;
 }
 
 function createElementAddTree(id) {
 	var span = [];
-	span.push(createSpan(['label', 'label-default'], function(){add(id)}, 'add'));
+	span.push(createSpan(['label', 'label-default'], function () { add(id) }, 'add'));
 	var li = document.createElement('li');
-	for(var index in span)
-		li.appendChild(span[index]); 
+	for (var index in span)
+		li.appendChild(span[index]);
 	return li;
 }
 
-function createSpan(cl, fn, name){
+function createSpan(cl, fn, name) {
 	var span = document.createElement('span');
-	for(var index in cl)
+	for (var index in cl)
 		span.classList.add(cl[index]);
 	span.addEventListener("click", fn);
 	span.textContent = name;
 	return span;
 }
 
-function hiddeElementTree (event) {
+function hiddeElementTree(event) {
 	var target = event.target;
 	var li = target.parentNode;
 	var childrenContainer = li.getElementsByTagName('ul')[0];
@@ -116,8 +116,8 @@ function hiddeElementTree (event) {
 }
 
 function del(id) {
-	for(var index in data){
-		if(data[index].id === id){
+	for (var index in data) {
+		if (data[index].id === id) {
 			delete data[index];
 		}
 	}
@@ -126,23 +126,58 @@ function del(id) {
 }
 
 function edit(id) {
-	for(var index in data){
-		if(data[index].id === id){
-			data[index].name = 'testEdit';
-			data[index].point = 100;
+	$('#modal').modal('show');
+	var modalSubmit = document.getElementById('modalSave');
+	var gridSystemModalLabel = document.getElementById('gridSystemModalLabel');
+	gridSystemModalLabel.innerHTML = 'Edit Element';
+	var name = document.getElementById('name');
+	var point = document.getElementById('point');
+	for (var index in data) {
+		if (data[index].id === id) {
+			name.value = data[index].name;
+			point.value = data[index].point;
+			modalSubmit.addEventListener('click', function () { editData(id) }, false);
 		}
 	}
-	tree.innerHTML = '';
-	tree.appendChild(allPointSum(0).ul);
 }
 
 function add(id) {
+	$('#modal').modal('show');
+	var modalSubmit = document.getElementById('modalSave');
+	var gridSystemModalLabel = document.getElementById('gridSystemModalLabel');
+	gridSystemModalLabel.innerHTML = 'Add Element';
+	modalSubmit.addEventListener('click', function () { addData(id) }, false);
+}
+
+
+function addData(id) {
+	var modalSubmit = document.getElementById('modalSave');
+	modalSubmit.parentNode.innerHTML = modalSubmit.parentNode.innerHTML;
+	var name = document.getElementById('name');
+	var point = document.getElementById('point');
 	data.push({
 		id: data.length + 1,
-		name: 'addtest',
-		point: 2,
+		name: name.value,
+		point: parseInt(point.value),
 		parent: id
 	})
 	tree.innerHTML = '';
 	tree.appendChild(allPointSum(0).ul);
+	$('#modal').modal('hide');
+}
+
+function editData(id) {
+	for (var index in data) {
+		if (data[index].id === id) {
+			var modalSubmit = document.getElementById('modalSave');
+			modalSubmit.parentNode.innerHTML = modalSubmit.parentNode.innerHTML;
+			var name = document.getElementById('name');
+			var point = document.getElementById('point');
+			data[index].name = name.value;
+			data[index].point = parseInt(point.value);
+			tree.innerHTML = '';
+			tree.appendChild(allPointSum(0).ul);
+		}
+	}
+	$('#modal').modal('hide');
 }

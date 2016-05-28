@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="BlackJack">
+
 <head>
 	<meta charset="UTF-8">
 	<title>Document</title>
@@ -7,12 +8,44 @@
 	<link rel="stylesheet" href="./lib/bootstrap.min.css">
 	<link rel="stylesheet" href="./lib/bootstrap-theme.min.css">
 </head>
+
 <body>
-<form>
-<div id="tree">
-</div>
+	<div id="tree"></div>
+
+	<div class="modal fade" tabindex="-1" id="modal" role="dialog" aria-labelledby="gridSystemModalLabel">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					<h4 class="modal-title" id="gridSystemModalLabel"></h4>
+				</div>
+				<div class="modal-body">
+					<form>
+						<div class="form-group">
+							<input type="text" id="name" class="form-control" placeholder="Name">
+						</div>
+						<div class="form-group">
+							<div class="input-group">
+								<div class="input-group-addon">$</div>
+								<input type="text" id="point" class="form-control" placeholder="Point">
+								<div class="input-group-addon">.00</div>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="button" id="modalSave"  class="btn btn-primary">Save</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<script type="text/javascript" src="./lib/jquery-1.11.3.min.js"></script>
 	<script type="text/javascript" src="./lib/bootstrap.min.js"></script>
 	<script type="text/javascript" src="./js/script.js"></script>
 </body>
+
 </html>
