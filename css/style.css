@@ -1,6 +1,44 @@
-#tree span:hover {
-  font-weight: bold;
+body {
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #333;
+  background-color: #fff;
 }
 #tree span {
   cursor: pointer;
+  margin-right: 3px;
+}
+#tree span:hover {
+  font-weight: bold;
+}
+#tree ul,
+#tree li {
+  position: relative;
+  line-height: 2;
+}
+#tree ul {
+  list-style: none;
+  padding-left: 25px;
+}
+#tree ul > li:last-child::after {
+  height: 8px;
+}
+#tree li::before,
+#tree li::after {
+  content: "";
+  position: absolute;
+  left: -17px;
+}
+#tree li::before {
+  border-top: 1px solid #838587;
+  top: 12px;
+  width: 15px;
+  height: 0px;
+}
+#tree li::after {
+  border-left: 1px solid #838587;
+  height: 100%;
+  width: 1px;
+  top: 4px;
 }

@@ -9,19 +9,19 @@ var data = [
 	{
 		id: 2,
 		name: 'test2',
-		point: 2,
+		point: 1,
 		parent: 0
 	},
 	{
 		id: 3,
 		name: 'test3',
-		point: 2,
+		point: 1,
 		parent: 1
 	},
 	{
 		id: 4,
 		name: 'test4',
-		point: 2,
+		point: 1,
 		parent: 1
 	},
 	{
@@ -57,59 +57,59 @@ var data = [
 ];
 
 var tree = document.getElementById('tree');
+tree.appendChild(allPointSum(0).ul);
 
-addTree();
-
-function addTree(){
-	tree.innerHTML = '';
-	var ul = document.createElement('div');
-	var li = document.createElement('li');
-	tree.appendChild(ul).id = 'treeId_0';
-
-	addСhild(0);
-	for (var index in data)
-		addСhild(data[index].id);	
+function allPointSum(id) {
+	var ul = document.createElement('ul');
+	var allPoint = 0;
+	for (var index in data) {
+		if (data[index].parent === id) {
+			var buf = allPointSum(data[index].id);
+			ul.appendChild(createElementTree(data[index], buf.allPoint)).appendChild(buf.ul);
+			allPoint += data[index].point; 
+			allPoint += buf.allPoint;
+		}
+	}
+	return {
+		allPoint: allPoint,
+		ul: ul
+	}
 }
-function addElement(id, text, point, allPoint) {
+
+function createElementTree(element, allPoint) {
+	var span = [];
+	var neme = element.name + '|' + element.point + '$' + (allPoint > 0? '|' + (element.point + allPoint) + '$': ''  );
+	span.push(createSpan(['label', 'label-default'], hiddeElementTree, neme));
+	span.push(createSpan(['label', 'label-primary'], function(){edit(element.id)}, 'edit'));
+	span.push(createSpan(['label', 'label-danger'], function(){del(element.id)}, 'del'));
 	var li = document.createElement('li');
-	var span = document.createElement('span');
-	li.id = 'treeId_' + id;
-	li.appendChild(span).textContent = text + ' | ' + point + '$ ' + (allPoint > 0? ' | ' + (point + allPoint) + '$': ''  );
+	li.id = 'treeId_' + element.id;
+	for(var index in span)
+		li.appendChild(span[index]); 
 	return li;
 }
-function addСhild(id) {
-	var ul = document.createElement('ul');
-	var dom = ul;
-	for (var index in data)
-		if (data[index].parent === id)
-			dom.appendChild(addElement(data[index].id, data[index].name, data[index].point, allPointSum(data[index].id)))
-	var tree = document.getElementById('treeId_' + id);
-	if (tree) {
-		tree.appendChild(dom);
-	} else {
-		dom.appendChild(addElement(data[index].id, data[index].name, data[index].point))
-		var tree = document.getElementById('treeId_0');
-		tree.appendChild(dom);
-	}
+
+function createSpan(cl, fn, name){
+	var span = document.createElement('span');
+	for(var index in cl)
+		span.classList.add(cl[index]);
+	span.addEventListener("click", fn);
+	span.textContent = name;
+	return span;
 }
 
-var tree = document.getElementsByTagName('ul')[0];
-tree.onclick = function (event) {
+function hiddeElementTree (event) {
 	var target = event.target;
-	if (target.tagName != 'SPAN') {
-		return;
-	}
 	var li = target.parentNode;
 	var childrenContainer = li.getElementsByTagName('ul')[0];
 	if (!childrenContainer) return;
 	childrenContainer.hidden = !childrenContainer.hidden;
 }
 
-function allPointSum(id, allPoint = 0) {
-	for (var index in data) {
-		if (data[index].parent === id) {
-			allPoint += allPointSum(data[index].id, data[index].point);
-		}
-	}
-	return allPoint
+function del(id) {
+	console.log('del', id);
+}
+
+function edit(id) {
+	console.log('edit', id);
 }

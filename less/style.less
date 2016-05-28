@@ -1,7 +1,53 @@
-#tree span:hover {
-    font-weight: bold;
+body {
+    font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #333;
+    background-color: #fff;
 }
 
-#tree span {
-    cursor: pointer;
-}
+#tree{
+    span {
+        cursor: pointer;
+        cursor: pointer;
+        margin-right: 3px;
+        &:hover {
+            font-weight: bold;
+        }
+    }
+     
+    & ul, 
+    & li {
+        position: relative;
+        line-height: 2;
+    }
+      
+    ul {
+        list-style: none;
+        padding-left: 25px;
+        & > li:last-child::after {
+            height: 8px;
+        }
+    }
+    
+    li::before,
+    li::after {
+        content: "";
+        position: absolute;
+        left: -17px;
+    }
+    
+    li::before {
+        border-top: 1px solid #838587;
+        top: 12px;
+        width: 15px;
+        height: 0px;
+    }
+    
+    li::after {
+        border-left: 1px solid #838587;
+        height: 100%;
+        width: 1px;
+        top: 4px;
+    }
+} 
