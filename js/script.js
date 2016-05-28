@@ -70,6 +70,7 @@ function allPointSum(id) {
 			allPoint += buf.allPoint;
 		}
 	}
+	ul.appendChild(createElementAddTree(id));
 	return {
 		allPoint: allPoint,
 		ul: ul
@@ -78,12 +79,20 @@ function allPointSum(id) {
 
 function createElementTree(element, allPoint) {
 	var span = [];
-	var neme = element.name + '|' + element.point + '$' + (allPoint > 0? '|' + (element.point + allPoint) + '$': ''  );
-	span.push(createSpan(['label', 'label-default'], hiddeElementTree, neme));
+	var neme = element.name + ' | ' + element.point + '$' + (allPoint > 0? ' | ' + (element.point + allPoint) + '$': '');
+	span.push(createSpan([], hiddeElementTree, neme));
 	span.push(createSpan(['label', 'label-primary'], function(){edit(element.id)}, 'edit'));
 	span.push(createSpan(['label', 'label-danger'], function(){del(element.id)}, 'del'));
 	var li = document.createElement('li');
-	li.id = 'treeId_' + element.id;
+	for(var index in span)
+		li.appendChild(span[index]); 
+	return li;
+}
+
+function createElementAddTree(id) {
+	var span = [];
+	span.push(createSpan(['label', 'label-default'], function(){add(id)}, 'add'));
+	var li = document.createElement('li');
 	for(var index in span)
 		li.appendChild(span[index]); 
 	return li;
@@ -107,9 +116,33 @@ function hiddeElementTree (event) {
 }
 
 function del(id) {
-	console.log('del', id);
+	for(var index in data){
+		if(data[index].id === id){
+			delete data[index];
+		}
+	}
+	tree.innerHTML = '';
+	tree.appendChild(allPointSum(0).ul);
 }
 
 function edit(id) {
-	console.log('edit', id);
+	for(var index in data){
+		if(data[index].id === id){
+			data[index].name = 'testEdit';
+			data[index].point = 100;
+		}
+	}
+	tree.innerHTML = '';
+	tree.appendChild(allPointSum(0).ul);
+}
+
+function add(id) {
+	data.push({
+		id: data.length + 1,
+		name: 'addtest',
+		point: 2,
+		parent: id
+	})
+	tree.innerHTML = '';
+	tree.appendChild(allPointSum(0).ul);
 }
