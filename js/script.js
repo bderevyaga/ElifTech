@@ -1,63 +1,15 @@
 'use strict'
-var data = [
-	{
-		id: 1,
-		name: 'test1',
-		point: 2,
-		parent: 0
-	},
-	{
-		id: 2,
-		name: 'test2',
-		point: 1,
-		parent: 0
-	},
-	{
-		id: 3,
-		name: 'test3',
-		point: 1,
-		parent: 1
-	},
-	{
-		id: 4,
-		name: 'test4',
-		point: 1,
-		parent: 1
-	},
-	{
-		id: 5,
-		name: 'test5',
-		point: 2,
-		parent: 2
-	},
-	{
-		id: 6,
-		name: 'test6',
-		point: 2,
-		parent: 3
-	},
-	{
-		id: 7,
-		name: 'test7',
-		point: 2,
-		parent: 3
-	},
-	{
-		id: 8,
-		name: 'test8',
-		point: 2,
-		parent: 1
-	},
-	{
-		id: 9,
-		name: 'test9',
-		point: 2,
-		parent: 5
-	}
-];
-
 var tree = document.getElementById('tree');
-tree.appendChild(allPointSum(0).ul);
+
+var data;
+var XHR = ("onload" in new XMLHttpRequest()) ? XMLHttpRequest : XDomainRequest;
+var xhr = new XHR();
+xhr.open("GET", "http://localhost/serever.php", true);
+xhr.onload = function() {
+  data = JSON.parse(this.responseText);
+  tree.appendChild(allPointSum(0).ul);
+}
+xhr.send();
 
 function allPointSum(id) {
 	var ul = document.createElement('ul');
@@ -121,8 +73,10 @@ function del(id) {
 			delete data[index];
 		}
 	}
-	tree.innerHTML = '';
-	tree.appendChild(allPointSum(0).ul);
+	AjaxTree('DELETE', "http://localhost/serever.php", {
+		id: id
+	})
+	reloadTree();
 }
 
 function edit(id) {
@@ -143,6 +97,7 @@ function edit(id) {
 
 function add(id) {
 	$('#modal').modal('show');
+	document.getElementById("form").reset();
 	var modalSubmit = document.getElementById('modalSave');
 	var gridSystemModalLabel = document.getElementById('gridSystemModalLabel');
 	gridSystemModalLabel.innerHTML = 'Add Element';
@@ -156,13 +111,17 @@ function addData(id) {
 	var name = document.getElementById('name');
 	var point = document.getElementById('point');
 	data.push({
-		id: data.length + 1,
+		id: data[data.length - 1].id + 1,
 		name: name.value,
 		point: parseInt(point.value),
 		parent: id
 	})
-	tree.innerHTML = '';
-	tree.appendChild(allPointSum(0).ul);
+	AjaxTree('POST', "http://localhost/serever.php", {
+		name: name.value,
+		point: parseInt(point.value),
+		parent: id
+	});
+	reloadTree();
 	$('#modal').modal('hide');
 }
 
@@ -175,9 +134,28 @@ function editData(id) {
 			var point = document.getElementById('point');
 			data[index].name = name.value;
 			data[index].point = parseInt(point.value);
-			tree.innerHTML = '';
-			tree.appendChild(allPointSum(0).ul);
+			AjaxTree('PUT', "http://localhost/serever.php", {
+				id: id,
+				name: name.value,
+				point: parseInt(point.value)
+			});
+			reloadTree();
 		}
 	}
 	$('#modal').modal('hide');
+}
+
+function AjaxTree(type, url, data){
+	var form = new FormData();
+	for (var index in data)
+		form.append(index, data[index]);
+	var XHR = ("onload" in new XMLHttpRequest()) ? XMLHttpRequest : XDomainRequest;
+	var xhr = new XHR();
+	xhr.open(type, url, true);
+	xhr.send(form);
+}
+
+function reloadTree(){
+	tree.innerHTML = '';
+	tree.appendChild(allPointSum(0).ul);
 }
