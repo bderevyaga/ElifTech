@@ -1,11 +1,13 @@
 <?php
 header('HTTP/1.1 201 Created');
 header("Content-Type: application/json;charset=utf-8");
-$user = 'root';
-$pass = '1111';
 
-$dbh = new PDO('mysql:host=localhost;dbname=test', $user, $pass);
-$dbh->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+$dsn= 'mysql:host=mysql.hostinger.com.ua;dbname=u919952063_test';
+$db_user = "***";
+$db_pass = "***";
+
+$dbh = new PDO($dsn, $db_user, $db_pass);
+$dbh->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
 //http://www.chlab.ch/blog/archives/webdevelopment/manually-parse-raw-http-data-php
 function parse_raw_http_request(array &$a_data)
@@ -41,7 +43,6 @@ $_PUT = array ();
 $_DELETE = array (); 
 if($_SERVER['REQUEST_METHOD'] == 'PUT'){
   parse_raw_http_request($_PUT);
-  echo 
   $dbh->query("UPDATE `tree` SET `name` = '".$_PUT['name']."', `point` = '".$_PUT['point']."' WHERE `tree`.`id` = ". $_PUT['id']);
 }else if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
   parse_raw_http_request($_DELETE);
@@ -55,5 +56,11 @@ if($_SERVER['REQUEST_METHOD'] == 'PUT'){
   }
 }else if($_SERVER['REQUEST_METHOD'] == 'POST'){
   $dbh->query("INSERT INTO `tree` (`id`, `name`, `point`, `parent`) VALUES (NULL, '". $_POST['name'] ."', '". $_POST['point'] ."', '". $_POST['parent'] ."')");
+  $get_info = $dbh->prepare('SELECT * from tree');
+  if($get_info->execute())
+  {
+      $information = $get_info->fetchAll(PDO::FETCH_ASSOC);
+      echo json_encode($information);
+  }
 }
 $dbh = null;

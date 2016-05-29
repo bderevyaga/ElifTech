@@ -1,10 +1,11 @@
 'use strict'
-var tree = document.getElementById('tree');
+var urlSerevar = "http://donet.hol.es/serever.php";
 
+var tree = document.getElementById('tree');
 var data;
 var XHR = ("onload" in new XMLHttpRequest()) ? XMLHttpRequest : XDomainRequest;
 var xhr = new XHR();
-xhr.open("GET", "http://localhost/serever.php", true);
+xhr.open("GET", urlSerevar, true);
 xhr.onload = function() {
   data = JSON.parse(this.responseText);
   tree.appendChild(allPointSum(0).ul);
@@ -15,10 +16,10 @@ function allPointSum(id) {
 	var ul = document.createElement('ul');
 	var allPoint = 0;
 	for (var index in data) {
-		if (data[index].parent === id) {
+		if (data[index].parent == id) {
 			var buf = allPointSum(data[index].id);
 			ul.appendChild(createElementTree(data[index], buf.allPoint)).appendChild(buf.ul);
-			allPoint += data[index].point;
+			allPoint += parseInt(data[index].point);
 			allPoint += buf.allPoint;
 		}
 	}
@@ -31,7 +32,7 @@ function allPointSum(id) {
 
 function createElementTree(element, allPoint) {
 	var span = [];
-	var neme = element.name + ' | ' + element.point + '$' + (allPoint > 0 ? ' | ' + (element.point + allPoint) + '$' : '');
+	var neme = element.name + ' | ' + element.point + '$' + (allPoint > 0 ? ' | ' + (parseInt(element.point) + allPoint) + '$' : '');
 	span.push(createSpan([], hiddeElementTree, neme));
 	span.push(createSpan(['label', 'label-primary'], function () { edit(element.id) }, 'edit'));
 	span.push(createSpan(['label', 'label-danger'], function () { del(element.id) }, 'del'));
@@ -73,7 +74,7 @@ function del(id) {
 			delete data[index];
 		}
 	}
-	AjaxTree('DELETE', "http://localhost/serever.php", {
+	AjaxTree('DELETE', urlSerevar, {
 		id: id
 	})
 	reloadTree();
@@ -110,18 +111,15 @@ function addData(id) {
 	modalSubmit.parentNode.innerHTML = modalSubmit.parentNode.innerHTML;
 	var name = document.getElementById('name');
 	var point = document.getElementById('point');
-	data.push({
-		id: data[data.length - 1].id + 1,
+	AjaxTree('POST', urlSerevar, {
 		name: name.value,
 		point: parseInt(point.value),
 		parent: id
-	})
-	AjaxTree('POST', "http://localhost/serever.php", {
-		name: name.value,
-		point: parseInt(point.value),
-		parent: id
+	}, function(param){
+		data = JSON.parse(param.responseText);
+  		tree.innerHTML = '';
+		tree.appendChild(allPointSum(0).ul);
 	});
-	reloadTree();
 	$('#modal').modal('hide');
 }
 
@@ -134,7 +132,7 @@ function editData(id) {
 			var point = document.getElementById('point');
 			data[index].name = name.value;
 			data[index].point = parseInt(point.value);
-			AjaxTree('PUT', "http://localhost/serever.php", {
+			AjaxTree('PUT', urlSerevar, {
 				id: id,
 				name: name.value,
 				point: parseInt(point.value)
@@ -145,7 +143,8 @@ function editData(id) {
 	$('#modal').modal('hide');
 }
 
-function AjaxTree(type, url, data){
+function AjaxTree(type, url, data, cb){
+	cb = cb? cb: function(sd){};
 	var form = new FormData();
 	for (var index in data)
 		form.append(index, data[index]);
@@ -153,6 +152,9 @@ function AjaxTree(type, url, data){
 	var xhr = new XHR();
 	xhr.open(type, url, true);
 	xhr.send(form);
+	xhr.onload = function() {
+		cb(this);
+	}
 }
 
 function reloadTree(){
